@@ -1,28 +1,26 @@
 {% extends "base.html" %}
 {% block title %}Feed{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <h2 class="mb-4">Feed</h2>
-
-        <form method="POST" novalidate class="mb-4">
-            {{ form.hidden_tag() }}
-            <div class="mb-2">
-                {{ form.body(class="form-control" + (" is-invalid" if form.body.errors else ""), rows="3", placeholder="What's happening?") }}
-                {% for error in form.body.errors %}
-                    <div class="invalid-feedback">{{ error }}</div>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="mb-4">Feed</h2>
+            <form method="POST" novalidate class="mb-4">
+                {{ form.hidden_tag() }}
+                <div class="mb-2">
+                    {{ form.body(class="form-control" + (" is-invalid" if form.body.errors else "") , rows="3", placeholder="What's happening?") }}
+                    {% for error in form.body.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {{ form.submit(class="btn btn-primary") }}
+            </form>
+            {% if tweets %}
+                {% for tweet in tweets %}
+                    {% include 'main/_tweet_card.html' %}
                 {% endfor %}
-            </div>
-            {{ form.submit(class="btn btn-primary") }}
-        </form>
-
-        {% if tweets %}
-            {% for tweet in tweets %}
-    {% include 'main/_tweet_card.html' %}
-{% endfor %}
-        {% else %}
-            <p class="text-muted">No tweets yet. Be the first!</p>
-        {% endif %}
+            {% else %}
+                <p class="text-muted">No tweets yet. Be the first!</p>
+            {% endif %}
+        </div>
     </div>
-</div>
 {% endblock %}

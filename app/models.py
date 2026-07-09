@@ -1,6 +1,8 @@
 from datetime import datetime
+
 from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from app import db, login_manager
 
 
@@ -9,40 +11,47 @@ def load_user(user_id):
     return db.session.get(User, int(user_id))
 
 
-likes = db.Table('likes',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('tweet_id', db.Integer, db.ForeignKey('tweets.id'), primary_key=True)
+likes = db.Table(
+    "likes",
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+    db.Column("tweet_id", db.Integer, db.ForeignKey("tweets.id"), primary_key=True),
 )
 
-follows = db.Table('follows',
-    db.Column('follower_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('followed_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
+follows = db.Table(
+    "follows",
+    db.Column("follower_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+    db.Column("followed_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
 )
 
 
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30), unique=True, nullable=False, index=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
-    bio = db.Column(db.String(160), default='')
+    bio = db.Column(db.String(160), default="")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    tweets = db.relationship('Tweet', backref='author', lazy='dynamic',
-                              cascade='all, delete-orphan')
+    tweets = db.relationship(
+        "Tweet", backref="author", lazy="dynamic", cascade="all, delete-orphan"
+    )
 
-    liked_tweets = db.relationship('Tweet', secondary=likes,
-                                    backref=db.backref('liked_by', lazy='dynamic'),
-                                    lazy='dynamic')
+    liked_tweets = db.relationship(
+        "Tweet",
+        secondary=likes,
+        backref=db.backref("liked_by", lazy="dynamic"),
+        lazy="dynamic",
+    )
 
     followed = db.relationship(
-        'User', secondary=follows,
+        "User",
+        secondary=follows,
         primaryjoin=(follows.c.follower_id == id),
         secondaryjoin=(follows.c.followed_id == id),
-        backref=db.backref('followers', lazy='dynamic'),
-        lazy='dynamic'
+        backref=db.backref("followers", lazy="dynamic"),
+        lazy="dynamic",
     )
 
     def set_password(self, password):
@@ -74,16 +83,16 @@ class User(UserMixin, db.Model):
         return self.followed.filter(follows.c.followed_id == user.id).count() > 0
 
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f"<User {self.username}>"
 
 
 class Tweet(db.Model):
-    __tablename__ = 'tweets'
+    __tablename__ = "tweets"
 
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String(280), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     def __repr__(self):
-        return f'<Tweet {self.id} by user {self.user_id}>'
+        return f"<Tweet {self.id} by user {self.user_id}>"
