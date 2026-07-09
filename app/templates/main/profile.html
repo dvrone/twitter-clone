@@ -5,12 +5,28 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="mb-4">
-            <h2>@{{ user.username }}</h2>
-            {% if user.bio %}
-                <p class="text-muted">{{ user.bio }}</p>
-            {% endif %}
-            <p class="small text-muted">Joined {{ user.created_at.strftime('%b %Y') }} · {{ tweets|length }} tweet{{ 's' if tweets|length != 1 else '' }}</p>
-        </div>
+    <h2>@{{ user.username }}</h2>
+    {% if user.bio %}
+        <p class="text-muted">{{ user.bio }}</p>
+    {% endif %}
+    <p class="small text-muted">Joined {{ user.created_at.strftime('%b %Y') }} · {{ tweets|length }} tweet{{ 's' if tweets|length != 1 else '' }}</p>
+    <p class="small">
+        <strong>{{ user.followed.count() }}</strong> Following ·
+        <strong>{{ user.followers.count() }}</strong> Followers
+    </p>
+
+    {% if user.id != current_user.id %}
+        {% if current_user.is_following(user) %}
+            <form method="POST" action="{{ url_for('main.unfollow', username=user.username) }}">
+                <button type="submit" class="btn btn-outline-secondary btn-sm">Unfollow</button>
+            </form>
+        {% else %}
+            <form method="POST" action="{{ url_for('main.follow', username=user.username) }}">
+                <button type="submit" class="btn btn-primary btn-sm">Follow</button>
+            </form>
+        {% endif %}
+    {% endif %}
+</div>
 
         {% if tweets %}
             {% for tweet in tweets %}

@@ -46,3 +46,26 @@ def unlike_tweet(tweet_id):
     current_user.unlike(tweet)
     db.session.commit()
     return redirect(request.referrer or url_for('main.feed'))
+
+
+@main_bp.route('/user/<username>/follow', methods=['POST'])
+@login_required
+def follow(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    if user.id == current_user.id:
+        flash("You can't follow yourself.", 'warning')
+    else:
+        current_user.follow(user)
+        db.session.commit()
+        flash(f'You are now following @{user.username}.', 'success')
+    return redirect(url_for('main.profile', username=username))
+
+
+@main_bp.route('/user/<username>/unfollow', methods=['POST'])
+@login_required
+def unfollow(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    current_user.unfollow(user)
+    db.session.commit()
+    flash(f'You unfollowed @{user.username}.', 'info')
+    return redirect(url_for('main.profile', username=username))

@@ -14,6 +14,11 @@ likes = db.Table('likes',
     db.Column('tweet_id', db.Integer, db.ForeignKey('tweets.id'), primary_key=True)
 )
 
+follows = db.Table('follows',
+    db.Column('follower_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('followed_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
+)
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -32,6 +37,14 @@ class User(UserMixin, db.Model):
                                     backref=db.backref('liked_by', lazy='dynamic'),
                                     lazy='dynamic')
 
+    followed = db.relationship(
+        'User', secondary=follows,
+        primaryjoin=(follows.c.follower_id == id),
+        secondaryjoin=(follows.c.followed_id == id),
+        backref=db.backref('followers', lazy='dynamic'),
+        lazy='dynamic'
+    )
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
@@ -48,6 +61,17 @@ class User(UserMixin, db.Model):
 
     def has_liked(self, tweet):
         return self.liked_tweets.filter(Tweet.id == tweet.id).count() > 0
+
+    def follow(self, user):
+        if not self.is_following(user) and user.id != self.id:
+            self.followed.append(user)
+
+    def unfollow(self, user):
+        if self.is_following(user):
+            self.followed.remove(user)
+
+    def is_following(self, user):
+        return self.followed.filter(follows.c.followed_id == user.id).count() > 0
 
     def __repr__(self):
         return f'<User {self.username}>'
