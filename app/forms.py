@@ -30,3 +30,8 @@ class LoginForm(FlaskForm):
 class TweetForm(FlaskForm):
     body = TextAreaField('What\'s happening?', validators=[DataRequired(), Length(max=280)])
     submit = SubmitField('Tweet')
+
+
+class EditProfileForm(FlaskForm):
+    bio = TextAreaField('Bio', validators=[Length(max=160)])
+    submit = SubmitField('Save Changes')

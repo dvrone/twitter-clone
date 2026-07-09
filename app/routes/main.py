@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, abort, r
 from flask_login import login_required, current_user
 from app import db
 from app.models import Tweet, User
-from app.forms import TweetForm
+from app.forms import TweetForm, EditProfileForm
 
 main_bp = Blueprint('main', __name__)
 
@@ -88,3 +88,15 @@ def delete_tweet(tweet_id):
     db.session.commit()
     flash('Tweet deleted.', 'info')
     return redirect(request.referrer or url_for('main.feed'))
+
+@main_bp.route('/settings/profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm(obj=current_user)
+    if form.validate_on_submit():
+        current_user.bio = form.bio.data
+        db.session.commit()
+        flash('Profile updated.', 'success')
+        return redirect(url_for('main.profile', username=current_user.username))
+
+    return render_template('main/edit_profile.html', form=form)
