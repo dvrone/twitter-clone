@@ -1,8 +1,8 @@
 <div class="card mb-3">
     <div class="card-body">
         <h6 class="card-subtitle mb-2 text-muted">
-            <a href="{{ url_for('main.profile', username=tweet.author.username) }}" class="text-decoration-none">@{{ tweet.author.username }}</a>
-            <span class="float-end small">{{ tweet.created_at.strftime('%b %d, %Y %H:%M') }}</span>
+            <a href="{{ url_for('main.profile', username=tweet.author.username) }}" class="text-decoration-none prompt">{{ tweet.author.username }}</a>
+<span class="float-end small log-time">{{ tweet.created_at.strftime('%b %d, %Y %H:%M') }}</span>
         </h6>
         <p class="card-text">{{ tweet.body }}</p>
 
