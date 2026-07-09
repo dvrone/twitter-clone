@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, abort
+from flask import Blueprint, render_template, redirect, url_for, flash, abort, request
 from flask_login import login_required, current_user
 from app import db
 from app.models import Tweet, User
@@ -28,3 +28,21 @@ def profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     tweets = user.tweets.order_by(Tweet.created_at.desc()).all()
     return render_template('main/profile.html', user=user, tweets=tweets)
+
+
+@main_bp.route('/tweet/<int:tweet_id>/like', methods=['POST'])
+@login_required
+def like_tweet(tweet_id):
+    tweet = Tweet.query.get_or_404(tweet_id)
+    current_user.like(tweet)
+    db.session.commit()
+    return redirect(request.referrer or url_for('main.feed'))
+
+
+@main_bp.route('/tweet/<int:tweet_id>/unlike', methods=['POST'])
+@login_required
+def unlike_tweet(tweet_id):
+    tweet = Tweet.query.get_or_404(tweet_id)
+    current_user.unlike(tweet)
+    db.session.commit()
+    return redirect(request.referrer or url_for('main.feed'))

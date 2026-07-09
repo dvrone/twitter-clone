@@ -9,6 +9,12 @@ def load_user(user_id):
     return db.session.get(User, int(user_id))
 
 
+likes = db.Table('likes',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('tweet_id', db.Integer, db.ForeignKey('tweets.id'), primary_key=True)
+)
+
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
 
@@ -22,15 +28,30 @@ class User(UserMixin, db.Model):
     tweets = db.relationship('Tweet', backref='author', lazy='dynamic',
                               cascade='all, delete-orphan')
 
+    liked_tweets = db.relationship('Tweet', secondary=likes,
+                                    backref=db.backref('liked_by', lazy='dynamic'),
+                                    lazy='dynamic')
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def like(self, tweet):
+        if not self.has_liked(tweet):
+            self.liked_tweets.append(tweet)
+
+    def unlike(self, tweet):
+        if self.has_liked(tweet):
+            self.liked_tweets.remove(tweet)
+
+    def has_liked(self, tweet):
+        return self.liked_tweets.filter(Tweet.id == tweet.id).count() > 0
+
     def __repr__(self):
         return f'<User {self.username}>'
-    
+
 
 class Tweet(db.Model):
     __tablename__ = 'tweets'

@@ -1,0 +1,22 @@
+<div class="card mb-3">
+    <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted">
+            <a href="{{ url_for('main.profile', username=tweet.author.username) }}" class="text-decoration-none">@{{ tweet.author.username }}</a>
+            <span class="float-end small">{{ tweet.created_at.strftime('%b %d, %Y %H:%M') }}</span>
+        </h6>
+        <p class="card-text">{{ tweet.body }}</p>
+
+        <div class="d-flex align-items-center gap-2">
+            {% if current_user.has_liked(tweet) %}
+                <form method="POST" action="{{ url_for('main.unlike_tweet', tweet_id=tweet.id) }}">
+                    <button type="submit" class="btn btn-sm btn-danger">♥ Liked</button>
+                </form>
+            {% else %}
+                <form method="POST" action="{{ url_for('main.like_tweet', tweet_id=tweet.id) }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">♡ Like</button>
+                </form>
+            {% endif %}
+            <span class="small text-muted">{{ tweet.liked_by.count() }} like{{ 's' if tweet.liked_by.count() != 1 else '' }}</span>
+        </div>
+    </div>
+</div>
