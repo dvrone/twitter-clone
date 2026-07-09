@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Feed{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="mb-4">Feed</h2>
+
+        {% if tweets %}
+            {% for tweet in tweets %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            @{{ tweet.author.username }}
+                            <span class="float-end small">{{ tweet.created_at.strftime('%b %d, %Y %H:%M') }}</span>
+                        </h6>
+                        <p class="card-text">{{ tweet.body }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">No tweets yet. Be the first!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
