@@ -3,6 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models import User
 from app.forms import RegistrationForm, LoginForm
+from random_username.generate import generate_username
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -14,11 +15,15 @@ def register():
 
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
+        username = generate_username(1)[0]
+        while User.query.filter_by(username=username).first():
+            username = generate_username(1)[0]
+
+        user = User(username=username, email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Account created! You can log in now.', 'success')
+        flash(f'Account created! Your username is @{username}. You can log in now.', 'success')
         return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html', form=form)
