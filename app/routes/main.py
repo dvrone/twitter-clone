@@ -100,3 +100,9 @@ def edit_profile():
         return redirect(url_for('main.profile', username=current_user.username))
 
     return render_template('main/edit_profile.html', form=form)
+
+@main_bp.route('/explore')
+@login_required
+def explore():
+    tweets = Tweet.query.order_by(Tweet.created_at.desc()).all()
+    return render_template('main/explore.html', tweets=tweets)

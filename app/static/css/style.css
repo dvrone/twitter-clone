@@ -104,3 +104,6 @@ a:hover { color: var(--accent-hover); }
 .log-time::before { content: '['; color: var(--text-muted); }
 .log-time::after { content: ']'; color: var(--text-muted); }
 .log-time { color: var(--text-muted); font-size: 0.78rem; }
+
+.nav-link { color: var(--text-muted); }
+.nav-link:hover { color: var(--accent); }
