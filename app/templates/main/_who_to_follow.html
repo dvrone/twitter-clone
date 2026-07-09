@@ -1,0 +1,19 @@
+<div class="card mb-3">
+    <div class="card-body">
+        <h6 class="card-subtitle mb-3 text-muted">Who to follow</h6>
+        {% if suggestions %}
+            {% for user in suggestions %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <a href="{{ url_for('main.profile', username=user.username) }}"
+                       class="text-decoration-none prompt">{{ user.username }}</a>
+                    <form method="POST"
+                          action="{{ url_for('main.follow', username=user.username) }}">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">Follow</button>
+                    </form>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="small text-muted mb-0">No suggestions right now.</p>
+        {% endif %}
+    </div>
+</div>

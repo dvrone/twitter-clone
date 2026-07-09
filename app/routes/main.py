@@ -1,6 +1,7 @@
 from flask import (Blueprint, abort, flash, redirect, render_template, request,
                    url_for)
 from flask_login import current_user, login_required
+from sqlalchemy import func
 
 from app import db
 from app.forms import EditProfileForm, TweetForm
@@ -29,7 +30,16 @@ def feed():
         .all()
     )
 
-    return render_template("main/feed.html", tweets=tweets, form=form)
+    suggestions = (
+        User.query.filter(~User.id.in_(followed_ids))
+        .order_by(func.random())
+        .limit(5)
+        .all()
+    )
+
+    return render_template(
+        "main/feed.html", tweets=tweets, form=form, suggestions=suggestions
+    )
 
 
 @main_bp.route("/user/<username>")
@@ -68,7 +78,7 @@ def follow(username):
         current_user.follow(user)
         db.session.commit()
         flash(f"You are now following @{user.username}.", "success")
-    return redirect(url_for("main.profile", username=username))
+    return redirect(request.referrer or url_for("main.profile", username=username))
 
 
 @main_bp.route("/user/<username>/unfollow", methods=["POST"])
@@ -78,7 +88,7 @@ def unfollow(username):
     current_user.unfollow(user)
     db.session.commit()
     flash(f"You unfollowed @{user.username}.", "info")
-    return redirect(url_for("main.profile", username=username))
+    return redirect(request.referrer or url_for("main.profile", username=username))
 
 
 @main_bp.route("/tweet/<int:tweet_id>/delete", methods=["POST"])
