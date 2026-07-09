@@ -13,7 +13,7 @@
             <a class="navbar-brand" href="{{ url_for('main.feed') }}">Twitter Clone</a>
             <div class="d-flex">
                 {% if current_user.is_authenticated %}
-                    <span class="navbar-text text-white me-3">@{{ current_user.username }}</span>
+                    <a class="navbar-text text-white me-3 text-decoration-none" href="{{ url_for('main.profile', username=current_user.username) }}">@{{ current_user.username }}</a>
                     <a class="btn btn-outline-light btn-sm" href="{{ url_for('auth.logout') }}">Log Out</a>
                 {% else %}
                     <a class="btn btn-outline-light btn-sm me-2" href="{{ url_for('auth.login') }}">Log In</a>

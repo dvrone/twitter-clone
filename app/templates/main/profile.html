@@ -1,20 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Feed{% endblock %}
+{% block title %}@{{ user.username }}{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <h2 class="mb-4">Feed</h2>
-
-        <form method="POST" novalidate class="mb-4">
-            {{ form.hidden_tag() }}
-            <div class="mb-2">
-                {{ form.body(class="form-control" + (" is-invalid" if form.body.errors else ""), rows="3", placeholder="What's happening?") }}
-                {% for error in form.body.errors %}
-                    <div class="invalid-feedback">{{ error }}</div>
-                {% endfor %}
-            </div>
-            {{ form.submit(class="btn btn-primary") }}
-        </form>
+        <div class="mb-4">
+            <h2>@{{ user.username }}</h2>
+            {% if user.bio %}
+                <p class="text-muted">{{ user.bio }}</p>
+            {% endif %}
+            <p class="small text-muted">Joined {{ user.created_at.strftime('%b %Y') }} · {{ tweets|length }} tweet{{ 's' if tweets|length != 1 else '' }}</p>
+        </div>
 
         {% if tweets %}
             {% for tweet in tweets %}
@@ -29,7 +25,7 @@
                 </div>
             {% endfor %}
         {% else %}
-            <p class="text-muted">No tweets yet. Be the first!</p>
+            <p class="text-muted">No tweets yet.</p>
         {% endif %}
     </div>
 </div>
