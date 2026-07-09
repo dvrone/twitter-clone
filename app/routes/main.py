@@ -18,7 +18,12 @@ def feed():
         flash('Tweet posted!', 'success')
         return redirect(url_for('main.feed'))
 
-    tweets = Tweet.query.order_by(Tweet.created_at.desc()).all()
+    followed_ids = [u.id for u in current_user.followed]
+    followed_ids.append(current_user.id)
+
+    tweets = Tweet.query.filter(Tweet.user_id.in_(followed_ids)) \
+                         .order_by(Tweet.created_at.desc()).all()
+
     return render_template('main/feed.html', tweets=tweets, form=form)
 
 
@@ -69,3 +74,17 @@ def unfollow(username):
     db.session.commit()
     flash(f'You unfollowed @{user.username}.', 'info')
     return redirect(url_for('main.profile', username=username))
+
+
+@main_bp.route('/tweet/<int:tweet_id>/delete', methods=['POST'])
+@login_required
+def delete_tweet(tweet_id):
+    tweet = Tweet.query.get_or_404(tweet_id)
+
+    if tweet.user_id != current_user.id:
+        abort(403)
+
+    db.session.delete(tweet)
+    db.session.commit()
+    flash('Tweet deleted.', 'info')
+    return redirect(request.referrer or url_for('main.feed'))
